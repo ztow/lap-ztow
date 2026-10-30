@@ -1,6 +1,6 @@
 {
   "productName": "Lap-ztow",
-  "version": "0.3.3",
+  "version": "0.3.4-ztow",
   "identifier": "com.julyx10.lap",
   "build": {
     "beforeBuildCommand": "pnpm --dir ../src-vite build",
