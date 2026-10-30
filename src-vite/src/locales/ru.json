@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "Начните с нового альбома",
-    "add_album_description": "Выберите папку и позвольте Lap упорядочить ваши фото и видео.",
+    "add_album_description": "Выберите папку и позвольте Lap-ztow упорядочить ваши фото и видео.",
     "smart_album_title": "Упорядочивайте объекты с помощью смарт-альбомов",
     "smart_album_description": "Для автоматической группировки подходящих фото используйте правила.",
     "collection_title": "Группируйте фото по коллекциям",
@@ -310,7 +310,7 @@
         "skip_once": "Пропустить этот файл и продолжить",
         "file_label": "Последний просканированный файл",
         "message": "Предыдущее сканирование завершилось некорректно.",
-        "message_with_file": "Предыдущее сканирование завершилось некорректно.\n\nПоследний просканированный файл:\n{file}\n\nЕсли продолжить, Lap пропустит этот файл один раз и возобновит сканирование."
+        "message_with_file": "Предыдущее сканирование завершилось некорректно.\n\nПоследний просканированный файл:\n{file}\n\nЕсли продолжить, Lap-ztow пропустит этот файл один раз и возобновит сканирование."
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "Предупреждения: {count}",
       "release_requested": "Запрошено освобождение: {count}",
       "kept_local": "Оставлено на этом устройстве: {count}",
-      "kept_local_hint": "Файлы, которые всегда хранятся на этом устройстве, или файлы, для которых Windows не разрешила Lap освободить место (контролируемый доступ к папкам)."
+      "kept_local_hint": "Файлы, которые всегда хранятся на этом устройстве, или файлы, для которых Windows не разрешила Lap-ztow освободить место (контролируемый доступ к папкам)."
     },
     "image_editor": {
       "title": "Редактировать",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "Based on",
+        "original_author": "julyx10 / Lap (original author)",
+        "edition": "This build",
+        "macos_optimization": "Optimized by ztow for the latest macOS on Apple Silicon. A first import of 4,244 photos and videos (75 GB) drops from 150 s to 65 s, with the same index and thumbnails as the original."
+      },
       "title": "О программе",
       "package": {
         "name": "Имя пакета",

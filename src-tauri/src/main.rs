@@ -6,7 +6,7 @@
 
 /**
  * Main entry point for the Tauri application.
- * project: Lap
+ * project: Lap-ztow (fork of Lap by julyx10)
  * author:  julyx10
  * date:    2024-08-08
  */

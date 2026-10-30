@@ -7,7 +7,7 @@
         <img :src="iconLogo" class="w-20 h-20 select-none [-webkit-app-region:no-drag]" draggable="false" />
       </div>
       <div class="flex flex-col text-left">
-        <h3 class="text-xl">{{ packageInfo.name }}</h3>
+        <h3 class="text-xl">Lap-ztow</h3>
         <p class="mt-2 text-sm">{{ $t('settings.about.package.app_description') }}</p>
       </div>
     </div>
@@ -78,6 +78,34 @@
       </div>
     </div>
 
+    <!-- origin -->
+    <div class="w-full max-w-lg rounded-box border border-base-content/5 bg-base-300/30 p-4 shadow-sm">
+      <div class="space-y-3 text-left">
+        <div class="grid grid-cols-[84px_1fr] items-start gap-3 text-sm">
+          <div class="text-base-content/30">
+            {{ $t('settings.about.fork.based_on') }}
+          </div>
+          <div>
+            <a
+              :href="upstreamUrl"
+              target="_blank"
+              class="inline-flex items-center gap-1.5 rounded-box py-0.5 hover:text-primary transition-colors"
+            >
+              <IconGithub class="t-icon-size-sm" />
+              <span>{{ $t('settings.about.fork.original_author') }}</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[84px_1fr] items-start gap-3 text-sm">
+          <div class="text-base-content/30">
+            {{ $t('settings.about.fork.edition') }}
+          </div>
+          <div class="leading-5">{{ $t('settings.about.fork.macos_optimization') }}</div>
+        </div>
+      </div>
+    </div>
+
     <!-- updates -->
     <div class="w-full max-w-lg rounded-box p-2 space-y-2 bg-base-300/30 border border-base-content/5 shadow-sm">
       <div class="flex items-center gap-2 text-base-content/30">
@@ -142,6 +170,7 @@ const privacyUrl = computed(() => {
   if (!repo) return 'https://github.com/julyx10/lap/blob/main/PRIVACY.md';
   return repo.endsWith('/') ? `${repo}blob/main/PRIVACY.md` : `${repo}/blob/main/PRIVACY.md`;
 });
+const upstreamUrl = 'https://github.com/julyx10/lap';
 const issuesUrl = computed(() => {
   const repo = packageInfo.value.repository || '';
   if (!repo) return 'https://github.com/julyx10/lap/issues';

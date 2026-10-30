@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "新しいアルバムから始めましょう",
-    "add_album_description": "フォルダを選択して、Lapに写真と動画を整理させましょう。",
+    "add_album_description": "フォルダを選択して、Lap-ztowに写真と動画を整理させましょう。",
     "smart_album_title": "スマートアルバムで整理",
     "smart_album_description": "条件に合う写真をルールで自動的にまとめます。",
     "collection_title": "コレクションで写真をまとめる",
@@ -310,7 +310,7 @@
         "skip_once": "このファイルをスキップして続行",
         "file_label": "最後にスキャンしたファイル",
         "message": "前回のスキャンは正常に終了しませんでした。",
-        "message_with_file": "前回のスキャンは正常に終了しませんでした。\n\n最後にスキャンしたファイル:\n{file}\n\n続行すると、Lap はこのファイルを一度だけスキップしてスキャンを再開します。"
+        "message_with_file": "前回のスキャンは正常に終了しませんでした。\n\n最後にスキャンしたファイル:\n{file}\n\n続行すると、Lap-ztow はこのファイルを一度だけスキップしてスキャンを再開します。"
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "警告: {count}",
       "release_requested": "解放を要求済み: {count}",
       "kept_local": "このデバイスに保持: {count}",
-      "kept_local_hint": "このデバイスに常に保持するファイル、または Windows が Lap による領域の解放を許可しなかったファイル（コントロールされたフォルダーアクセス）。"
+      "kept_local_hint": "このデバイスに常に保持するファイル、または Windows が Lap-ztow による領域の解放を許可しなかったファイル（コントロールされたフォルダーアクセス）。"
     },
     "image_editor": {
       "title": "編集",
@@ -1559,7 +1559,7 @@
       "multilingual_model_download_message": "多言語写真検索モデルがインストールされていません。ダウンロードすると50以上の言語で検索できます。",
       "download": "ダウンロード",
       "downloading_multilingual_model": "多言語モデルをダウンロード中",
-      "multilingual_model_download_success": "多言語検索モデルの準備ができました。使用するには Lap を再起動してください。",
+      "multilingual_model_download_success": "多言語検索モデルの準備ができました。使用するには Lap-ztow を再起動してください。",
       "multilingual_model_download_failed": "多言語検索モデルのダウンロードに失敗しました",
       "similarity": "検索の類似度",
       "similarity_hint": "キーワード検索の画像一致を調整します",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "Based on",
+        "original_author": "julyx10 / Lap (original author)",
+        "edition": "This build",
+        "macos_optimization": "Optimized by ztow for the latest macOS on Apple Silicon. A first import of 4,244 photos and videos (75 GB) drops from 150 s to 65 s, with the same index and thumbnails as the original."
+      },
       "title": "情報",
       "package": {
         "name": "パッケージ名",

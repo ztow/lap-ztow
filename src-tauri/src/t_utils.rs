@@ -3168,11 +3168,12 @@ pub fn count_folder_files(path: &str) -> (u64, u64, u64, u64, u64, u64, u64) {
 }
 
 pub fn count_folder_files_filtered(path: &str, file_types: i64, excluded_folders: &[String], small_image_filter: i64) -> (u64, u64, u64, u64, u64, u64, u64) {
-    count_folder_files_cancellable(path, file_types, excluded_folders, small_image_filter, || false).unwrap_or_default()
+    count_folder_files_cancellable(path, file_types, excluded_folders, small_image_filter, &mut Vec::new(), || false).unwrap_or_default()
 }
 
 fn count_folder_files_cancellable(path: &str, file_types: i64, excluded_folders: &[String],
-    small_image_filter: i64, is_cancelled: impl Fn() -> bool) -> Option<(u64, u64, u64, u64, u64, u64, u64)> {
+    small_image_filter: i64, video_paths: &mut Vec<String>,
+    is_cancelled: impl Fn() -> bool) -> Option<(u64, u64, u64, u64, u64, u64, u64)> {
     let mut folder_count = 0;
     let mut image_file_count = 0;
     let mut total_image_size = 0;
@@ -3212,6 +3213,7 @@ fn count_folder_files_cancellable(path: &str, file_types: i64, excluded_folders:
                     2 => {
                         video_file_count += 1;
                         total_video_size += size;
+                        video_paths.push(entry.path().to_string_lossy().to_string());
                     }
                     _ => {}
                 }
@@ -3712,10 +3714,13 @@ impl ProcessingBudget {
         let total_budget = ((logical_cores as f64) * 0.7).floor().max(1.0) as usize;
         let heavy_budget = if logical_cores <= 8 { 1 } else { 2 }.min(total_budget);
         let normal_budget = total_budget.saturating_sub(heavy_budget).max(1);
+        // One permit per pooled vision session; more callers than sessions would
+        // only queue inside ONNX Runtime.
+        let embedding_budget = crate::t_ai::vision_pool_shape().0;
         Self {
             normal_thumb: Arc::new(Semaphore::new(normal_budget)),
             heavy_thumb: Arc::new(Semaphore::new(heavy_budget)),
-            embedding: Arc::new(Semaphore::new(1)),
+            embedding: Arc::new(Semaphore::new(embedding_budget)),
         }
     }
 }
@@ -4090,6 +4095,21 @@ async fn process_thumbnail_task(
     }
 }
 
+struct VideoMetadataPrefetchGuard;
+
+impl VideoMetadataPrefetchGuard {
+    fn start(paths: Vec<String>) -> Self {
+        crate::t_video::start_video_metadata_prefetch(paths);
+        Self
+    }
+}
+
+impl Drop for VideoMetadataPrefetchGuard {
+    fn drop(&mut self) {
+        crate::t_video::finish_video_metadata_prefetch();
+    }
+}
+
 pub async fn index_album_worker(
     app_handle: &tauri::AppHandle,
     cancellation_token: Arc<Mutex<HashMap<i64, bool>>>,
@@ -4133,7 +4153,9 @@ pub async fn index_album_worker(
     }
 
     // Never persist a partial pre-count when cancellation interrupts traversal.
+    let mut video_paths: Vec<String> = Vec::new();
     let counts = count_folder_files_cancellable(&album.path, album.file_types, &album.excluded_folders, album.small_image_filter,
+        &mut video_paths,
         || cancellation_token.lock().map(|flags| flags.get(&album_id) == Some(&true)).unwrap_or(true));
     let Some((_folders, image_count, _image_size, video_count, _video_size, scan_total, scan_total_size)) = counts else {
         app_handle.emit("index_finished", FinishedPayload {
@@ -4155,6 +4177,9 @@ pub async fn index_album_worker(
     };
     let total_files = image_count + video_count;
     let search_total = image_count;
+    // Probe video metadata in the background so the serial walk never waits on
+    // one ffprobe launch per video it reaches.
+    let _video_prefetch = VideoMetadataPrefetchGuard::start(video_paths);
 
     // Resume only when totals match and previous indexed is a valid in-progress value.
     // This avoids breaking normal re-scan behavior after a completed run.
@@ -4564,7 +4589,7 @@ mod album_scan_filter_tests {
         image::RgbImage::new(800, 600).save(&path).unwrap();
         assert_eq!(filter_image_dimensions(&path.to_string_lossy(), 1), Some((800, 600)));
         assert_eq!(excluded_image_dimensions(&path.to_string_lossy(), 1, 160), None);
-        assert_eq!(count_folder_files_cancellable(root.to_str().unwrap(), 7, &[], 160, || true), None);
+        assert_eq!(count_folder_files_cancellable(root.to_str().unwrap(), 7, &[], 160, &mut Vec::new(), || true), None);
         fs::remove_dir_all(root).unwrap();
     }
 
@@ -4574,7 +4599,7 @@ mod album_scan_filter_tests {
         fs::create_dir_all(&root).unwrap();
         for i in 0..5 { fs::write(root.join(format!("{i}.jpg")), b"123").unwrap(); }
         let visited = std::cell::Cell::new(0);
-        let counts = count_folder_files_cancellable(root.to_str().unwrap(), 7, &[], 0, || {
+        let counts = count_folder_files_cancellable(root.to_str().unwrap(), 7, &[], 0, &mut Vec::new(), || {
             visited.set(visited.get() + 1);
             visited.get() > 3
         });

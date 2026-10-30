@@ -13,7 +13,7 @@ pub fn install_app_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let about_item =
         MenuItemBuilder::with_id("about", format!("About {}", app.package_info().name))
             .build(app)?;
-    let home_item = MenuItemBuilder::with_id("help_homepage", "Lap Home").build(app)?;
+    let home_item = MenuItemBuilder::with_id("help_homepage", "Lap-ztow Home").build(app)?;
     let release_notes_item =
         MenuItemBuilder::with_id("help_release_notes", "Release Notes").build(app)?;
     let readme_item = MenuItemBuilder::with_id("help_readme", "README").build(app)?;
@@ -92,11 +92,8 @@ pub fn handle_menu_event<R: Runtime>(app: &AppHandle<R>, event: MenuEvent) {
             );
         }
         "help_release_notes" => {
-            let _ = opener::open(format!(
-                "{}/guide/release-notes/v{}.html",
-                option_env!("CARGO_PKG_HOMEPAGE").unwrap_or("https://julyx10.github.io/lap"),
-                env!("CARGO_PKG_VERSION")
-            ));
+            // Release notes are maintained by the original project.
+            let _ = opener::open("https://github.com/julyx10/lap/releases");
         }
         "help_readme" => {
             let _ = opener::open(format!(

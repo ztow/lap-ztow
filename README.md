@@ -17,6 +17,18 @@ English | [Deutsch](i18n/README.de.md) | [Español](i18n/README.es.md) | [Franç
 Lap is an open-source, local-first photo manager for browsing family albums, finding old photos quickly, and managing large personal media libraries offline.
 It is a privacy-focused alternative to cloud photo services: no forced upload, local AI search, folder-first workflow, and free to use.
 
+> ### About this fork: lap-ztow
+>
+> This repository is a personal fork of [julyx10/lap](https://github.com/julyx10/lap), maintained by [ztow](https://github.com/ztow).
+> The app, its features, and its GPL-3.0 license are unchanged; all credit for Lap belongs to the original author, **julyx10**.
+>
+> The only difference is performance work for the latest macOS on Apple Silicon. On a 4,244-file / 75 GB album, the first import went from **150 s to 65 s (2.3×)** with an identical index, thumbnail set, and search embeddings:
+>
+> - Video metadata is probed in the background instead of one `ffprobe` launch per video inside the serial scan loop.
+> - Android Motion Photo detection maps the file instead of reading it twice (most JPEGs in large libraries do not end with an EOI marker).
+> - Apple Live Photo identifiers are parsed on raw bytes instead of converting a 128 KB header to UTF-8 per image.
+> - CLIP vision sessions are pooled, and the release profile is optimized for speed instead of binary size.
+
 ## Download Lap
 
 Open the [latest release page](https://github.com/julyx10/lap/releases/latest), then download the file that matches your system:

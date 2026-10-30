@@ -13,6 +13,7 @@
 //!   2. Otherwise we scan for the Samsung `MotionPhoto_Data` marker, then for an
 //!      MP4 `ftyp` box (4-byte size + `ftyp` + 4-byte major brand).
 
+use memchr::memmem;
 use std::fs;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
@@ -72,33 +73,35 @@ pub fn detect_motion_photo(path: &Path) -> Option<u64> {
         return None;
     }
 
-    // Bounded header read first: XMP (the authoritative offset) is near the
-    // start of the file, so most motion photos resolve without a full read.
-    if let Some(header) = read_prefix(path, XMP_HEADER_READ_SIZE) {
-        if let Some(offset) = find_xmp_video_offset(&header, size as usize) {
-            if is_mp4_at_offset(path, offset as u64) && size - offset as u64 >= MIN_VIDEO_SIZE {
-                return Some(offset as u64);
-            }
+    // The bytes are mapped rather than copied: files with an unexpected tail
+    // can be tens of megabytes each and there are many of them, so the page
+    // cache is read directly instead of allocating and copying whole buffers.
+    let file = fs::File::open(path).ok()?;
+    match unsafe { memmap2::Mmap::map(&file) } {
+        Ok(mapping) => detect_in_bytes(&mapping),
+        Err(_) => detect_in_bytes(&fs::read(path).ok()?),
+    }
+}
+
+fn detect_in_bytes(data: &[u8]) -> Option<u64> {
+    let size = data.len();
+
+    // Bounded header scan first: XMP (the authoritative offset) is near the
+    // start of the file, so most motion photos resolve without a full scan.
+    let header = &data[..size.min(XMP_HEADER_READ_SIZE)];
+    if let Some(offset) = find_xmp_video_offset(header, size) {
+        if is_mp4_at(data, offset) && size - offset >= MIN_VIDEO_SIZE as usize {
+            return Some(offset as u64);
         }
     }
 
     // Fallback: full scan for the Samsung marker / trailing ftyp box. Only
     // reached for files without XMP or with an invalid XMP offset.
-    let data = fs::read(path).ok()?;
-    let offset = find_video_offset(&data)?;
-    if size - offset < MIN_VIDEO_SIZE {
+    let offset = find_video_offset(data)? as usize;
+    if size - offset < MIN_VIDEO_SIZE as usize {
         return None;
     }
-    Some(offset)
-}
-
-/// Read up to `max` bytes from the start of `path`.
-fn read_prefix(path: &Path, max: usize) -> Option<Vec<u8>> {
-    let mut f = fs::File::open(path).ok()?;
-    let mut buf = vec![0u8; max];
-    let n = f.read(&mut buf).ok()?;
-    buf.truncate(n);
-    Some(buf)
+    Some(offset as u64)
 }
 
 /// Returns true if `offset` points at a valid MP4 `ftyp` box in `path`.
@@ -229,23 +232,22 @@ fn is_mp4_at(data: &[u8], offset: usize) -> bool {
 }
 
 fn has_jpeg_eoi_before(data: &[u8], offset: usize) -> bool {
-    data[..offset.min(data.len())]
-        .windows(2)
-        .any(|marker| marker == [0xFF, 0xD9])
+    let end = offset.min(data.len());
+    memmem::rfind(&data[..end], b"\xff\xd9").is_some()
 }
 
 fn find_subslice(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if needle.is_empty() || haystack.len() < needle.len() {
         return None;
     }
-    haystack.windows(needle.len()).position(|w| w == needle)
+    memmem::find(haystack, needle)
 }
 
 fn find_subslice_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if needle.is_empty() || haystack.len() < needle.len() {
         return None;
     }
-    haystack.windows(needle.len()).rposition(|w| w == needle)
+    memmem::rfind(haystack, needle)
 }
 
 /// Find an `ftyp` box (4-byte size + `ftyp` + valid brand) in `data[start..end)`
@@ -255,12 +257,11 @@ fn find_ftyp_in_range(data: &[u8], start: usize, end: usize) -> Option<usize> {
     if start >= end {
         return None;
     }
-    let mut i = start;
-    while i + 8 <= end {
-        if is_valid_ftyp_box(data, i) && has_jpeg_eoi_before(data, i - 4) {
-            return Some(i.saturating_sub(4));
+    for relative in memmem::find_iter(&data[start..end], b"ftyp") {
+        let ftyp_pos = start + relative;
+        if is_valid_ftyp_box(data, ftyp_pos) && has_jpeg_eoi_before(data, ftyp_pos - 4) {
+            return Some(ftyp_pos - 4);
         }
-        i += 1;
     }
     None
 }
@@ -268,14 +269,12 @@ fn find_ftyp_in_range(data: &[u8], start: usize, end: usize) -> Option<usize> {
 /// Find the last MP4 `ftyp` box in the file, returning the box start offset.
 fn find_last_ftyp(data: &[u8], start: usize) -> Option<usize> {
     let mut last: Option<usize> = None;
-    let mut i = start;
-    while i + 8 <= data.len() {
-        if is_valid_ftyp_box(data, i) && has_jpeg_eoi_before(data, i - 4) {
-            last = Some(i.saturating_sub(4));
-            i += 8;
-            continue;
+    for relative in memmem::find_iter(&data[start.min(data.len())..], b"ftyp") {
+        let ftyp_pos = start + relative;
+        // `is_valid_ftyp_box` rejects positions before the 4-byte size field.
+        if is_valid_ftyp_box(data, ftyp_pos) && has_jpeg_eoi_before(data, ftyp_pos - 4) {
+            last = Some(ftyp_pos - 4);
         }
-        i += 1;
     }
     last
 }

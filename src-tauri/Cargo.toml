@@ -1,11 +1,11 @@
 [package]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-name = "Lap"
+name = "lap-ztow"
 version = "0.3.3"
-description = "An offline-first photo manager for large local libraries."
-homepage = "https://julyx10.github.io/lap"
-repository = "https://github.com/julyx10/lap"
-authors = ["julyx10 <tiangle@gmail.com>"]
+description = "An offline-first photo manager for large local libraries, with macOS performance optimizations."
+homepage = "https://github.com/ztow/lap-ztow"
+repository = "https://github.com/ztow/lap-ztow"
+authors = ["julyx10 <tiangle@gmail.com>", "ztow"]
 edition = "2024"
 license = "GPL-3.0-or-later"
 build = "build.rs"
@@ -18,7 +18,7 @@ tauri-build = { version = "2", features = [] }
 [profile.release]
 codegen-units = 1
 lto = true
-opt-level = "z"
+opt-level = 3
 panic = "abort"
 strip = true
 
@@ -82,6 +82,7 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 jxl-oxide = { version = "0.12.5", features = ["image"] }
 libc = "0.2"
 hnsw_rs = "0.3.4"
+memchr = "2.8"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 percent-encoding = "2.3.1"

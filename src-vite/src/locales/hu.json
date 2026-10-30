@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "Kezdés új albummal",
-    "add_album_description": "Válasszon mappát, a Lap pedig rendszerezi a fotókat és videókat.",
+    "add_album_description": "Válasszon mappát, a Lap-ztow pedig rendszerezi a fotókat és videókat.",
     "smart_album_title": "Rendezés intelligens albumokkal",
     "smart_album_description": "Szabályokkal automatikusan csoportosíthatja a feltételeknek megfelelő fotókat.",
     "collection_title": "Fotók gyűjteményekbe rendezése",
@@ -310,7 +310,7 @@
         "skip_once": "Fájl kihagyása és folytatás",
         "file_label": "Utolsó beolvasott fájl",
         "message": "Az előző beolvasás nem állt le megfelelően.",
-        "message_with_file": "Az előző beolvasás nem állt le megfelelően.\n\nUtolsó beolvasott fájl:\n{file}\n\nFolytatáskor a Lap egyszer kihagyja ezt a fájlt, majd folytatja a beolvasást."
+        "message_with_file": "Az előző beolvasás nem állt le megfelelően.\n\nUtolsó beolvasott fájl:\n{file}\n\nFolytatáskor a Lap-ztow egyszer kihagyja ezt a fájlt, majd folytatja a beolvasást."
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "Figyelmeztetések: {count}",
       "release_requested": "Felszabadítás kérve: {count}",
       "kept_local": "Az eszközön megtartva: {count}",
-      "kept_local_hint": "Az eszközön mindig megtartandó fájlok, illetve azok, amelyeknél a Windows nem engedte a Lap számára a tárhely felszabadítását (vezérelt mappahozzáférés)."
+      "kept_local_hint": "Az eszközön mindig megtartandó fájlok, illetve azok, amelyeknél a Windows nem engedte a Lap-ztow számára a tárhely felszabadítását (vezérelt mappahozzáférés)."
     },
     "image_editor": {
       "title": "Szerkesztés",
@@ -1307,7 +1307,7 @@
       "network": "Hálózati hiba a videó betöltése közben",
       "decode": "Videó dekódolási hiba",
       "format": "Nem támogatott videoformátum, vagy a fájl sérült.",
-      "external_player_recommended": "A videó lejátszásához kompatibilis formátumba kell kódolni. Hosszú videóknál a Lap külső lejátszót javasol a háttérfeldolgozás kivárása helyett.",
+      "external_player_recommended": "A videó lejátszásához kompatibilis formátumba kell kódolni. Hosszú videóknál a Lap-ztow külső lejátszót javasol a háttérfeldolgozás kivárása helyett.",
       "unsafe_webview": "Ez a videóformátum nem játszható le.",
       "open_in_external_app": "Megnyitás külső lejátszóban",
       "open_in_external_app_named": "Videó megnyitása itt: {app}...",
@@ -1559,7 +1559,7 @@
       "multilingual_model_download_message": "A többnyelvű fotókeresési modell nincs telepítve. Töltse le az 50-nél több nyelvű kereséshez.",
       "download": "Letöltés",
       "downloading_multilingual_model": "Többnyelvű modell letöltése",
-      "multilingual_model_download_success": "A többnyelvű keresési modell készen áll. Indítsa újra a Lapot a használatához.",
+      "multilingual_model_download_success": "A többnyelvű keresési modell készen áll. Indítsa újra a Lap-ztowot a használatához.",
       "multilingual_model_download_failed": "Nem sikerült letölteni a többnyelvű keresési modellt",
       "similarity": "Keresési hasonlóság",
       "similarity_hint": "A kulcsszavas keresés vizuális egyezéseit szabályozza",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "Based on",
+        "original_author": "julyx10 / Lap (original author)",
+        "edition": "This build",
+        "macos_optimization": "Optimized by ztow for the latest macOS on Apple Silicon. A first import of 4,244 photos and videos (75 GB) drops from 150 s to 65 s, with the same index and thumbnails as the original."
+      },
       "title": "Névjegy",
       "package": {
         "name": "Csomagnév",

@@ -7037,14 +7037,22 @@ impl AFile {
             return Err("Skipped: the original is online-only".to_string());
         }
 
-        // 4. Generate embedding
-        let mut engine = state.0.lock().unwrap();
+        // 4. Generate embedding. The engine lock is not held during inference:
+        // vision sessions are pooled and handed out one per caller.
+        if !state
+            .0
+            .lock()
+            .unwrap_or_else(|error| error.into_inner())
+            .is_loaded()
+        {
+            return Err("AI models not loaded".to_string());
+        }
 
-        let encode_original = |engine: &mut t_ai::AiEngine| {
+        let encode_original = || {
             if !t_utils::content_readable(&file_path) {
                 return Err("Skipped: the original is not local".to_string());
             }
-            engine.encode_image(&file_path)
+            state.encode_image(&file_path)
         };
 
         // Optimized: Use thumbnail if available (much faster than loading original)
@@ -7053,13 +7061,11 @@ impl AFile {
             Ok(Some(thumb)) if thumb.thumb_data.is_some() => {
                 let thumb_bytes = thumb.thumb_data.as_ref().unwrap();
                 match panic::catch_unwind(AssertUnwindSafe(|| {
-                    engine.encode_image_from_bytes(thumb_bytes)
+                    state.encode_image_from_bytes(thumb_bytes)
                 })) {
                     Ok(res) => res.or_else(|_| {
                         // If thumbnail processing fails (e.g. corrupted), try original
-                        match panic::catch_unwind(AssertUnwindSafe(|| {
-                            encode_original(&mut engine)
-                        })) {
+                        match panic::catch_unwind(AssertUnwindSafe(|| encode_original())) {
                             Ok(res2) => res2,
                             Err(_) => Err(format!(
                                 "Embedding panic while encoding original image: {}",
@@ -7068,9 +7074,7 @@ impl AFile {
                         }
                     }),
                     // If thumbnail path panics, still try original once.
-                    Err(_) => match panic::catch_unwind(AssertUnwindSafe(|| {
-                        encode_original(&mut engine)
-                    })) {
+                    Err(_) => match panic::catch_unwind(AssertUnwindSafe(|| encode_original())) {
                         Ok(res2) => res2,
                         Err(_) => Err(format!(
                             "Embedding panic while encoding original image: {}",
@@ -7079,7 +7083,7 @@ impl AFile {
                     },
                 }
             }
-            _ => match panic::catch_unwind(AssertUnwindSafe(|| encode_original(&mut engine))) {
+            _ => match panic::catch_unwind(AssertUnwindSafe(|| encode_original())) {
                 Ok(res) => res,
                 Err(_) => Err(format!(
                     "Embedding panic while encoding original image: {}",

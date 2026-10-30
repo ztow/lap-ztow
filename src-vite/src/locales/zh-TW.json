@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "從新相簿開始",
-    "add_album_description": "選擇資料夾，讓 Lap 為你整理相片與影片。",
+    "add_album_description": "選擇資料夾，讓 Lap-ztow 為你整理相片與影片。",
     "smart_album_title": "用智慧相簿整理",
     "smart_album_description": "用規則自動分組符合條件的相片。",
     "collection_title": "將相片分組到收藏",
@@ -310,7 +310,7 @@
         "skip_once": "跳過此檔案並繼續",
         "file_label": "上次掃描的檔案",
         "message": "上次掃描未正常結束。",
-        "message_with_file": "上次的掃描工作未正常結束。\n\n上次掃描的檔案：\n{file}\n\n若繼續，Lap 會跳過此檔案一次並恢復掃描。"
+        "message_with_file": "上次的掃描工作未正常結束。\n\n上次掃描的檔案：\n{file}\n\n若繼續，Lap-ztow 會跳過此檔案一次並恢復掃描。"
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "警告：{count}",
       "release_requested": "已要求釋放：{count}",
       "kept_local": "保留在此裝置：{count}",
-      "kept_local_hint": "一律保留在此裝置上的檔案，或 Windows 不允許 Lap 釋放空間的檔案（受控資料夾存取）。"
+      "kept_local_hint": "一律保留在此裝置上的檔案，或 Windows 不允許 Lap-ztow 釋放空間的檔案（受控資料夾存取）。"
     },
     "image_editor": {
       "title": "編輯",
@@ -1307,7 +1307,7 @@
       "network": "載入影片時發生網路錯誤",
       "decode": "影片解碼錯誤",
       "format": "不支援的影片格式或檔案已損毀。",
-      "external_player_recommended": "此影片需要先轉檔為相容格式才能在此播放。對於長影片，Lap 建議使用外部播放器，而非等待背景處理。",
+      "external_player_recommended": "此影片需要先轉檔為相容格式才能在此播放。對於長影片，Lap-ztow 建議使用外部播放器，而非等待背景處理。",
       "unsafe_webview": "不支援播放此影片格式。",
       "open_in_external_app": "用外部播放器開啟",
       "open_in_external_app_named": "用 {app} 開啟影片...",
@@ -1559,7 +1559,7 @@
       "multilingual_model_download_message": "尚未安裝多語言相片搜尋模型。下載後即可以超過 50 種語言搜尋。",
       "download": "下載",
       "downloading_multilingual_model": "正在下載多語言模型",
-      "multilingual_model_download_success": "多語言搜尋模型已就緒。請重新啟動 Lap 以使用。",
+      "multilingual_model_download_success": "多語言搜尋模型已就緒。請重新啟動 Lap-ztow 以使用。",
       "multilingual_model_download_failed": "無法下載多語言搜尋模型",
       "similarity": "搜尋相似度",
       "similarity_hint": "控制關鍵字搜尋的視覺相符程度",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "來源",
+        "original_author": "julyx10 / Lap（原作者）",
+        "edition": "本版本",
+        "macos_optimization": "由 ztow 針對最新 macOS（Apple Silicon）最佳化。4,244 個照片與影片（75 GB）首次匯入從 150 秒降到 65 秒，索引與縮圖與原版完全一致。"
+      },
       "title": "關於",
       "package": {
         "name": "套件名稱",

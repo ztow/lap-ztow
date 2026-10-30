@@ -635,7 +635,7 @@ pub fn get_video_thumbnail_sync(
     })
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct VideoMetadata {
     pub width: u32,
     pub height: u32,
@@ -1003,9 +1003,111 @@ async fn analyze_strategy(json: &Value, file_path: &str) -> VideoAction {
     VideoAction::Transcode
 }
 
+/// Probes video metadata for `paths` in the background while an album walk
+/// indexes images. The walk visits files one at a time, so probing each video
+/// inside it serializes hundreds of ffprobe launches; filling this cache ahead
+/// of the walk keeps them off the indexing critical path.
+struct VideoProbePrefetch {
+    state: std::sync::Mutex<PrefetchState>,
+}
+
+struct PrefetchState {
+    queue: std::collections::VecDeque<String>,
+    results: HashMap<String, Result<VideoMetadata, String>>,
+    stopped: bool,
+}
+
+static ACTIVE_VIDEO_PREFETCH: std::sync::Mutex<Option<std::sync::Arc<VideoProbePrefetch>>> =
+    std::sync::Mutex::new(None);
+
+const VIDEO_PREFETCH_WORKERS: usize = 4;
+
+impl VideoProbePrefetch {
+    fn next_path(&self) -> Option<String> {
+        let mut state = self.state.lock().unwrap_or_else(|error| error.into_inner());
+        if state.stopped {
+            return None;
+        }
+        while let Some(path) = state.queue.pop_front() {
+            if !state.results.contains_key(&path) {
+                return Some(path);
+            }
+        }
+        None
+    }
+
+    fn store(&self, path: String, result: Result<VideoMetadata, String>) {
+        if let Ok(mut state) = self.state.lock() {
+            state.results.insert(path, result);
+        }
+    }
+
+    fn lookup(&self, path: &str) -> Option<Result<VideoMetadata, String>> {
+        self.state
+            .lock()
+            .ok()
+            .and_then(|state| state.results.get(path).cloned())
+    }
+}
+
+fn active_video_prefetch() -> Option<std::sync::Arc<VideoProbePrefetch>> {
+    ACTIVE_VIDEO_PREFETCH
+        .lock()
+        .ok()
+        .and_then(|active| active.clone())
+}
+
+pub fn start_video_metadata_prefetch(paths: Vec<String>) {
+    if paths.is_empty() {
+        return;
+    }
+    let worker_count = paths.len().min(VIDEO_PREFETCH_WORKERS);
+    let prefetch = std::sync::Arc::new(VideoProbePrefetch {
+        state: std::sync::Mutex::new(PrefetchState {
+            queue: paths.into(),
+            results: HashMap::new(),
+            stopped: false,
+        }),
+    });
+    if let Ok(mut active) = ACTIVE_VIDEO_PREFETCH.lock() {
+        *active = Some(prefetch.clone());
+    }
+    for _ in 0..worker_count {
+        let prefetch = prefetch.clone();
+        tauri::async_runtime::spawn(async move {
+            while let Some(path) = prefetch.next_path() {
+                let result = get_video_metadata_async(&path).await;
+                prefetch.store(path, result);
+            }
+        });
+    }
+}
+
+pub fn finish_video_metadata_prefetch() {
+    if let Ok(mut active) = ACTIVE_VIDEO_PREFETCH.lock() {
+        if let Some(prefetch) = active.take() {
+            if let Ok(mut state) = prefetch.state.lock() {
+                state.stopped = true;
+                state.queue.clear();
+            }
+        }
+    }
+}
+
 pub fn get_video_metadata(file_path: &str) -> Result<VideoMetadata, String> {
+    let prefetch = active_video_prefetch();
+    if let Some(result) = prefetch
+        .as_ref()
+        .and_then(|prefetch| prefetch.lookup(file_path))
+    {
+        return result;
+    }
     let handle = tokio::runtime::Handle::try_current().map_err(|_| "No runtime handle")?;
-    tokio::task::block_in_place(|| handle.block_on(get_video_metadata_async(file_path)))
+    let result = tokio::task::block_in_place(|| handle.block_on(get_video_metadata_async(file_path)));
+    if let Some(prefetch) = prefetch {
+        prefetch.store(file_path.to_string(), result.clone());
+    }
+    result
 }
 
 fn first_exist(meta: &HashMap<String, String>, keys: &[&str]) -> Option<String> {

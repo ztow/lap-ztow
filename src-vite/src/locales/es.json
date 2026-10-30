@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "Comienza con un álbum nuevo",
-    "add_album_description": "Selecciona una carpeta y deja que Lap organice tus fotos y videos.",
+    "add_album_description": "Selecciona una carpeta y deja que Lap-ztow organice tus fotos y videos.",
     "smart_album_title": "Organiza con álbumes inteligentes",
     "smart_album_description": "Usa reglas para agrupar automáticamente las fotos que cumplan tus criterios.",
     "collection_title": "Agrupa fotos en colecciones",
@@ -310,7 +310,7 @@
         "skip_once": "Omitir este archivo y continuar",
         "file_label": "Último archivo escaneado",
         "message": "El último escaneo no terminó correctamente.",
-        "message_with_file": "El escaneo anterior no finalizó correctamente.\n\nÚltimo archivo escaneado:\n{file}\n\nSi continúas, Lap omitirá este archivo una vez y reanudará el escaneo."
+        "message_with_file": "El escaneo anterior no finalizó correctamente.\n\nÚltimo archivo escaneado:\n{file}\n\nSi continúas, Lap-ztow omitirá este archivo una vez y reanudará el escaneo."
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "Advertencias: {count}",
       "release_requested": "Liberación solicitada: {count}",
       "kept_local": "Conservados en este dispositivo: {count}",
-      "kept_local_hint": "Archivos que mantienes siempre en este dispositivo o cuyo espacio Windows no permitió liberar a Lap (acceso controlado a carpetas)."
+      "kept_local_hint": "Archivos que mantienes siempre en este dispositivo o cuyo espacio Windows no permitió liberar a Lap-ztow (acceso controlado a carpetas)."
     },
     "image_editor": {
       "title": "Editar",
@@ -1307,7 +1307,7 @@
       "network": "Error red",
       "decode": "Error decodificación",
       "format": "Formato de vídeo no admitido o el archivo está dañado.",
-      "external_player_recommended": "Este vídeo necesita una transcodificación de compatibilidad antes de poder reproducirse aquí. Para vídeos largos, Lap recomienda utilizar un reproductor externo en lugar de esperar al procesamiento en segundo plano.",
+      "external_player_recommended": "Este vídeo necesita una transcodificación de compatibilidad antes de poder reproducirse aquí. Para vídeos largos, Lap-ztow recomienda utilizar un reproductor externo en lugar de esperar al procesamiento en segundo plano.",
       "unsafe_webview": "Este formato de vídeo no es compatible con la reproducción.",
       "open_in_external_app": "Abrir en un reproductor externo",
       "open_in_external_app_named": "Abrir vídeo en {app}...",
@@ -1559,7 +1559,7 @@
       "multilingual_model_download_message": "El modelo de búsqueda de fotos multilingüe no está instalado. Descárgalo para habilitar la búsqueda en más de 50 idiomas.",
       "download": "Descargar",
       "downloading_multilingual_model": "Descargando modelo multilingüe",
-      "multilingual_model_download_success": "El modelo de búsqueda multilingüe está listo. Reinicia Lap para usarlo.",
+      "multilingual_model_download_success": "El modelo de búsqueda multilingüe está listo. Reinicia Lap-ztow para usarlo.",
       "multilingual_model_download_failed": "No se pudo descargar el modelo de búsqueda multilingüe",
       "similarity": "Similitud de búsqueda",
       "similarity_hint": "Controla las coincidencias visuales en búsquedas por palabras clave",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "Based on",
+        "original_author": "julyx10 / Lap (original author)",
+        "edition": "This build",
+        "macos_optimization": "Optimized by ztow for the latest macOS on Apple Silicon. A first import of 4,244 photos and videos (75 GB) drops from 150 s to 65 s, with the same index and thumbnails as the original."
+      },
       "title": "Acerca de",
       "package": {
         "name": "Nombre paquete",

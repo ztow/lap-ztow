@@ -696,61 +696,77 @@ pub(crate) fn apple_content_identifier_from_bytes(buf: &[u8]) -> Option<String> 
 }
 
 pub(crate) fn apple_content_identifiers_from_bytes(buf: &[u8]) -> Vec<String> {
-    let text = String::from_utf8_lossy(&buf);
+    // Scanning raw bytes keeps this allocation-light; the identifier bytes are
+    // always ASCII, so a lossy UTF-8 copy of a multi-megabyte header is wasted
+    // work on every indexed image.
     let mut identifiers = Vec::new();
     for marker in [
-        "com.apple.quicktime.content.identifier",
-        "ContentIdentifier",
+        b"com.apple.quicktime.content.identifier".as_slice(),
+        b"ContentIdentifier".as_slice(),
     ] {
-        if let Some(identifier) = identifier_after_marker(&text, marker) {
-            identifiers.push(identifier);
+        if let Some(identifier) = identifier_after_marker_bytes(buf, marker) {
+            push_content_identifier(&mut identifiers, identifier);
         }
     }
 
     // Some Photos-exported HEIC files keep the identifier in an HEIF metadata
     // item without the XMP property name as a plain-text neighbour. The caller
     // only accepts this value when it exactly matches the filename-paired MOV.
-    for token in text.split(|c: char| !(c.is_ascii_alphanumeric() || c == '-' || c == '_')) {
-        let mut add_identifier = |identifier: &str| {
-            if looks_like_content_identifier(identifier)
-                && !identifiers
-                    .iter()
-                    .any(|existing| existing.eq_ignore_ascii_case(identifier))
-            {
-                identifiers.push(identifier.to_string());
-            }
-        };
-        add_identifier(token);
+    for token in buf.split(|byte| !is_content_identifier_byte(*byte)) {
+        if let Some(identifier) = content_identifier_from_token(token) {
+            push_content_identifier(&mut identifiers, identifier);
+        }
 
         // HEIF item payloads can prefix the UUID with a non-metadata byte
         // that still decodes as ASCII. Search the token for an embedded UUID.
         for start in 0..token.len().saturating_sub(35) {
-            add_identifier(&token[start..start + 36]);
+            if let Some(identifier) = content_identifier_from_token(&token[start..start + 36]) {
+                push_content_identifier(&mut identifiers, identifier);
+            }
         }
     }
     identifiers
 }
 
-fn identifier_after_marker(text: &str, marker: &str) -> Option<String> {
-    let marker_offset = text.find(marker)? + marker.len();
-    let value_area = text.get(marker_offset..)?;
-    let value_area = &value_area[..value_area.len().min(256)];
-    value_area
-        .split(|c: char| !(c.is_ascii_alphanumeric() || c == '-' || c == '_'))
-        .find(|token| looks_like_content_identifier(token))
-        .map(str::to_string)
+fn push_content_identifier(identifiers: &mut Vec<String>, identifier: String) {
+    if !identifiers
+        .iter()
+        .any(|existing| existing.eq_ignore_ascii_case(&identifier))
+    {
+        identifiers.push(identifier);
+    }
 }
 
-pub(crate) fn looks_like_content_identifier(value: &str) -> bool {
+fn is_content_identifier_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_'
+}
+
+fn content_identifier_from_token(token: &[u8]) -> Option<String> {
+    if looks_like_content_identifier_bytes(token) {
+        std::str::from_utf8(token).ok().map(str::to_string)
+    } else {
+        None
+    }
+}
+
+fn identifier_after_marker_bytes(buf: &[u8], marker: &[u8]) -> Option<String> {
+    let marker_offset = memchr::memmem::find(buf, marker)? + marker.len();
+    let value_area = &buf[marker_offset..buf.len().min(marker_offset + 256)];
+    value_area
+        .split(|byte| !is_content_identifier_byte(*byte))
+        .find_map(content_identifier_from_token)
+}
+
+fn looks_like_content_identifier_bytes(value: &[u8]) -> bool {
     let len = value.len();
     if !(32..=64).contains(&len) {
         return false;
     }
 
     let uuid_like = len == 36
-        && value.chars().enumerate().all(|(idx, ch)| match idx {
-            8 | 13 | 18 | 23 => ch == '-',
-            _ => ch.is_ascii_hexdigit(),
+        && value.iter().enumerate().all(|(idx, byte)| match idx {
+            8 | 13 | 18 | 23 => *byte == b'-',
+            _ => byte.is_ascii_hexdigit(),
         });
     if uuid_like {
         return true;
@@ -758,8 +774,8 @@ pub(crate) fn looks_like_content_identifier(value: &str) -> bool {
 
     len >= 32
         && value
-            .chars()
-            .all(|ch| ch.is_ascii_hexdigit() || ch == '-' || ch == '_')
+            .iter()
+            .all(|byte| byte.is_ascii_hexdigit() || *byte == b'-' || *byte == b'_')
 }
 
 #[cfg(test)]

@@ -275,7 +275,7 @@
   },
   "welcome": {
     "add_album_title": "새 앨범으로 시작하세요",
-    "add_album_description": "폴더를 선택하고 Lap이 사진과 동영상을 정리하도록 하세요.",
+    "add_album_description": "폴더를 선택하고 Lap-ztow이 사진과 동영상을 정리하도록 하세요.",
     "smart_album_title": "스마트 앨범으로 정리",
     "smart_album_description": "규칙에 맞는 사진을 자동으로 그룹화합니다.",
     "collection_title": "컬렉션에 사진 모으기",
@@ -310,7 +310,7 @@
         "skip_once": "이 파일을 건너뛰고 계속",
         "file_label": "마지막으로 스캔한 파일",
         "message": "이전 스캔이 정상적으로 종료되지 않았습니다.",
-        "message_with_file": "이전 스캔이 정상적으로 종료되지 않았습니다.\n\n마지막으로 스캔한 파일:\n{file}\n\n계속하면 Lap이 이 파일을 한 번 건너뛰고 스캔을 다시 시작합니다."
+        "message_with_file": "이전 스캔이 정상적으로 종료되지 않았습니다.\n\n마지막으로 스캔한 파일:\n{file}\n\n계속하면 Lap-ztow이 이 파일을 한 번 건너뛰고 스캔을 다시 시작합니다."
       }
     }
   },
@@ -1027,7 +1027,7 @@
       "warnings": "경고: {count}",
       "release_requested": "공간 확보 요청: {count}",
       "kept_local": "이 장치에 유지: {count}",
-      "kept_local_hint": "이 장치에 항상 유지하는 파일 또는 Windows가 Lap의 공간 확보를 허용하지 않은 파일입니다(제어된 폴더 액세스)."
+      "kept_local_hint": "이 장치에 항상 유지하는 파일 또는 Windows가 Lap-ztow의 공간 확보를 허용하지 않은 파일입니다(제어된 폴더 액세스)."
     },
     "image_editor": {
       "title": "편집",
@@ -1559,7 +1559,7 @@
       "multilingual_model_download_message": "다국어 사진 검색 모델이 설치되어 있지 않습니다. 다운로드하면 50개 이상 언어 검색을 사용할 수 있습니다.",
       "download": "다운로드",
       "downloading_multilingual_model": "다국어 모델 다운로드 중",
-      "multilingual_model_download_success": "다국어 검색 모델이 준비되었습니다. 사용하려면 Lap을 다시 시작하세요.",
+      "multilingual_model_download_success": "다국어 검색 모델이 준비되었습니다. 사용하려면 Lap-ztow을 다시 시작하세요.",
       "multilingual_model_download_failed": "다국어 검색 모델 다운로드 실패",
       "similarity": "검색 유사도",
       "similarity_hint": "키워드 검색의 시각적 일치 결과를 조절합니다",
@@ -1770,6 +1770,12 @@
       ]
     },
     "about": {
+      "fork": {
+        "based_on": "Based on",
+        "original_author": "julyx10 / Lap (original author)",
+        "edition": "This build",
+        "macos_optimization": "Optimized by ztow for the latest macOS on Apple Silicon. A first import of 4,244 photos and videos (75 GB) drops from 150 s to 65 s, with the same index and thumbnails as the original."
+      },
       "title": "정보",
       "package": {
         "name": "패키지 이름",
