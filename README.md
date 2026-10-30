@@ -1,3 +1,52 @@
+> ## lap-ztow — my build of Lap, tuned for the latest macOS
+>
+> A personal fork of [Lap](https://github.com/julyx10/lap), maintained by [ztow](https://github.com/ztow).
+> All credit belongs to the original author, **julyx10**; the GPL-3.0 license is unchanged. The upstream project is where features and fixes should go.
+>
+> **What I changed: performance only.** No feature, UI, or data-format changes — the same index, thumbnails, and search embeddings come out the other end:
+>
+> - Video metadata is probed on background workers instead of launching one external tool per video inside the serial scan loop.
+> - Android Motion Photo detection memory-maps the file instead of reading it twice.
+> - Apple Live Photo identifiers are matched on raw bytes instead of converting a 128 KB header to UTF-8 for every image.
+> - CLIP vision sessions are pooled, and the release build is compiled for speed instead of binary size.
+>
+> Measured on the same directory (4,244 files / 75 GB, M5 Pro, 15 cores): first import **150.8 s → 65.4 s** (30 → 65 files/s), CPU average 243% → 555%, peak 376% → 735%.
+>
+> ### Download and install (macOS, Apple Silicon)
+>
+> Get the DMG from the [latest release](https://github.com/ztow/lap-ztow/releases/latest).
+>
+> **This build is not notarized by Apple.** It has no Apple Developer ID; it is signed locally, so Gatekeeper will refuse the first launch. That is expected — the download is fine.
+>
+> 1. Open the DMG and drag **Lap-ztow** into **Applications**.
+> 2. Double-click it. macOS says it cannot verify the app — click **Done**. **Do not move it to the Trash.**
+> 3. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to Lap-ztow, then confirm with your password.
+> 4. Launch it again. The prompt appears only once.
+>
+> macOS no longer offers the old Control-click → **Open** shortcut, so the Privacy & Security route is the one that works. Terminal equivalent, if you prefer:
+>
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/Lap-ztow.app
+> ```
+>
+> <details>
+> <summary>中文安装说明</summary>
+>
+> 这个版本没有通过 Apple 公证（没有开发者签名），所以第一次打开一定会被系统拦一次。**不要把它删掉，也不要移到废纸篓。**
+>
+> 1. 打开 DMG，把 **Lap-ztow** 拖进「应用程序」。
+> 2. 双击打开，提示"无法验证开发者 / Apple 无法检查其是否包含恶意软件"时，点「完成」。
+> 3. 打开 **系统设置 → 隐私与安全性**，向下滚动到底部，在 Lap-ztow 那一行点「仍要打开」，输入密码。
+> 4. 再打开一次即可，之后不会再提示。
+>
+> 新版 macOS 已经没有「右键 → 打开」这一步了，必须走隐私与安全性。也可以用终端：
+>
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/Lap-ztow.app
+> ```
+>
+> </details>
+
 <div align="center">
   <img src="docs/public/icon.png" alt="Lap Logo" width="120" style="border-radius: 20px">
   <h1>Lap - Private Local Photo Manager</h1>
@@ -16,18 +65,6 @@ English | [Deutsch](i18n/README.de.md) | [Español](i18n/README.es.md) | [Franç
 
 Lap is an open-source, local-first photo manager for browsing family albums, finding old photos quickly, and managing large personal media libraries offline.
 It is a privacy-focused alternative to cloud photo services: no forced upload, local AI search, folder-first workflow, and free to use.
-
-> ### About this fork: lap-ztow
->
-> This repository is a personal fork of [julyx10/lap](https://github.com/julyx10/lap), maintained by [ztow](https://github.com/ztow).
-> The app, its features, and its GPL-3.0 license are unchanged; all credit for Lap belongs to the original author, **julyx10**.
->
-> The only difference is performance work for the latest macOS on Apple Silicon. On a 4,244-file / 75 GB album, the first import went from **150 s to 65 s (2.3×)** with an identical index, thumbnail set, and search embeddings:
->
-> - Video metadata is probed in the background instead of one `ffprobe` launch per video inside the serial scan loop.
-> - Android Motion Photo detection maps the file instead of reading it twice (most JPEGs in large libraries do not end with an EOI marker).
-> - Apple Live Photo identifiers are parsed on raw bytes instead of converting a 128 KB header to UTF-8 per image.
-> - CLIP vision sessions are pooled, and the release profile is optimized for speed instead of binary size.
 
 ## Download Lap
 
